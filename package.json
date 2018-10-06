@@ -1,0 +1,25 @@
+{
+  "name": "alfeka",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "actions-on-google": "1.1.0",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "request": "^2.88.0",
+    "request-promise": "4.2.1",
+    "string_score": "0.1.22",
+    "text-to-speech-js": "^1.1.6"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/C1-SoftwareEngineeringSummit/team7"
+  },
+  "author": "",
+  "license": "ISC"
+}
