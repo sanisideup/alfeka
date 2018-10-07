@@ -31,12 +31,6 @@ module.exports = {
             }
             console.log('A message written')
         })
-        port.write('B', function(err) {
-            if (err) {
-              return console.log('Error on write: ', err.message)
-            }
-            console.log('B message written')
-        })
 
         console.log("addValue hit")
         return speech;
