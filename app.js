@@ -238,10 +238,12 @@ app.post("/", function (request, response) {
   actionMap.set(WELCOME_ACTION, handleWelcome);
   actionMap.set(CHECK_BALANCE_ACTION, handleCheckBalance);
   actionMap.set(FIND_LAST_TRANSACTION_ACTION, handleLastTransaction);
-  actionMap.set(SAVE_MONEY_ACTION, handleSaveMoney);
-  actionMap.set(FIND_BILL, handleFindBill);
+  actionMap.set(CHANGE_GOAL_ACTION, handleChangeGoal);
   actionMap.set(TRANSFER_MONEY_ACTION, handleTransferMoney);
+  actionMap.set(FIND_BILL, handleFindBill);
   actionMap.set(PAY_BILL, handlePayBill);
+  actionMap.set(SAVE_MONEY_ACTION, handleSaveMoney);
+
 
   //Register the action map with the assistant
   assistant.handleRequest(actionMap);
