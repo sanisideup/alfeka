@@ -11,7 +11,7 @@ module.exports = {
         say.speak(speech)
         return speech;
     },
-    convertBalance: function(currency, json) {
+   /* convertBalance: function(currency, json) {
         const currentBalance = json.balance
         var convertedBalance
         var currencySymbol
@@ -42,41 +42,41 @@ module.exports = {
         console.log("convertBalance hit")
         say.speak(speech)
         return speech
-    },
-    findLastTransaction: function(json) {
-        const transAmount = json[0].amount
-        const transDate = json[0].purchase_date
-        const transDesc = json[0].description
-        console.log("findLastTransaction hit")
-        var speech = ""
-        if (transDesc != null) {
-            speech = ("Your last transaction was a purchase for " + transDesc +
-                " in the amout of $" + transAmount + " on " + transDate);
-            say.speak(speech)
-            return speech
-        } else {
-            speech = ("Your last transaction was a purchase for " + transAmount +
-                " " + "on" + " " + transDate);
-            say.speak(speech)
-            return speech
-        }
+    }, */
+     findLastTransaction: function(json) {
+         const transAmount = json[0].amount
+         const transDate = json[0].purchase_date
+         const transDesc = json[0].description
+         console.log("findLastTransaction hit")
+         var speech = ""
+         if (transDesc != null) {
+             speech = ("Your last transaction was a purchase for " + transDesc +
+                 " in the amout of $" + transAmount + " on " + transDate);
+             say.speak(speech)
+             return speech
+         } else {
+             speech = ("Your last transaction was a purchase for " + transAmount +
+                 " " + "on" + " " + transDate);
+             say.speak(speech)
+             return speech
+         }
 
-    },
-    findCompanyTicker: function(companyName) {
+     },
+    /*findCompanyTicker: function(companyName) {
         if(companyName in tickersData[0]) {
             return tickersData[0][companyName]
         } else {
           return nil
         }
-    },
-    findStockPrice: function (companyName, companyTicker, json) {
+    },*/
+    /*findStockPrice: function (companyName, companyTicker, json) {
         const stockPrice = json.datatable.data[0][5]
         var speech = ("As of today, the stock price of " + companyName + " is $" + stockPrice)
         
         console.log("findStockPrice hit")
         say.speak(speech)
         return speech
-    },
+    },*/
     transferMoney: function(json) {
         const amountTransferred = json.objectCreated.amount
         var speech = ("You have transferred $" + amountTransferred + " to Mark's account")
