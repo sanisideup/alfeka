@@ -54,7 +54,7 @@ app.post("/", function (request, response) {
   }
 
   function handleCheckBalanceHttp() {
-    const checkBalanceAPIUrl = NESSIE_API_URL + CHILD_GOAL_ACCOUNT + "?key=" + NESSIE_API_KEY;
+    const checkBalanceAPIUrl = NESSIE_API_URL + CHILD_CUSTOMER_ACCOUNT + "?key=" + NESSIE_API_KEY;
 
     return httpRequest({
         method: "GET",
@@ -63,8 +63,7 @@ app.post("/", function (request, response) {
         }).then(function (json) {
         const speech = utilities.findBalance(json);
         return speech;
-        })
-        .catch(function (err) {
+        }).catch(function (err) {
         console.log("Error:" + err);
         const speech = "I could not check your balance. Ask me something else.";
         return speech;
@@ -79,28 +78,52 @@ app.post("/", function (request, response) {
   const CHANGE_GOAL_ACTION = "changeGoal"; 
   //Handler function for Nessie 
   function handleChangeGoal(assistant){
-  	return handleChangeGoalHttp().then(results => {
+  	//sets the new goal amount to goalAmount
+  	const GOAL_AMOUNT_ARG = "goalAmount"
+  	const goalAmount = parseFloat(assistant.getArgument(GOAL_AMOUNT_ARG));
+
+  	return handleChangeGoalHttp(goalAmount).then(results => {
   		console.log(results);
   		assistant.add(results);
   	});
   }
 
-  function handleChangeGoalHttp(){
-  	const changeGoalAPIUrl = NESSIE_API_URL + CHILD_GOAL_ACCOUNT +"?key="+ NESSIE_API_KEY;
+  function handleChangeGoalHttp(goalAmount){
+  	const childGoalAPIUrl = NESSIE_API_URL + CHILD_GOAL_ACCOUNT +"?key="+ NESSIE_API_KEY;
 
-     return httpRequest({
-     	method: "GET",
-      	uri: changeGoalAPIUrl,
-      	json: true
-    	}).then(function(json){
-      	const speech = utilities.changeGoal(json);
-      	return speech; 
-    	})
-    	.catch(function(err){
-      	console.log("Error:" + err);
-      	const speech = "I cannot understand that request. Ask me something else";
-      	return speech; 
+  	var oldGoal = httpRequest({
+  		method: "GET",
+  		uri: childGoalAPIUrl,
+  		json: true
+  		}).then(function (json) {
+  		const oldGoalBalance = utilities.findBalance(json);
+  		return oldGoalBalance; 
+  		}).catch(function (err) {
+        console.log("Error:" + err);
     });
+  		
+  	if(goalAmount > oldGoal){
+  		return httpRequest({
+  			method: "POST",
+      		uri: childGoalAPIUrl,
+      		json: true,
+      		body: {
+      			"medium": "balance",
+          		"payee_id": "5bb957e8f0cec56abfa43ccd",
+          		"amount": goalAmount - oldGoal,
+          		"transaction_date": "2018-07-10",
+          		"description": "string"
+          	}
+          }).then(function(json){
+          	const speech = utilities.transferMoney(json);
+          	return speech;
+          })
+          .catch(function(err){
+          	console.log("Error:" + err);
+          });
+      }
+      else
+      	withdraw oldGoal - goalAmount
   }
 
 
