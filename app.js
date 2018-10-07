@@ -130,44 +130,58 @@ app.post("/", function (request, response) {
   }
 
   function handleChangeGoalHttp(goalAmount){
-    const childGoalAPIUrl = NESSIE_API_URL + CHILD_GOAL_ACCOUNT +"?key="+ NESSIE_API_KEY;
+  	const childGoalAPIUrl = NESSIE_API_URL + CHILD_GOAL_ACCOUNT +"?key="+ NESSIE_API_KEY;
 
-    var oldGoal = httpRequest({
-        method: "GET",
-        uri: childGoalAPIUrl,
-        json: true
-        }).then(function (json) {
-        const oldGoalBalance = utilities.findBalance(json);
-        return oldGoalBalance; 
-        }).catch(function (err) {
-      console.log("Error:" + err);
-  });
-        
-    const childGoalDepositUrl = NESSIE_API_URL + CHILD_GOAL_ACCOUNT + "/deposits?key=" + NESSIE_API_KEY; 
-    if(goalAmount > oldGoal){
-        return httpRequest({
-            method: "POST",
-            uri: childGoalDepositUrl,
-            json: true,
-            body:{
-                "medium" : "balance",
-                "status": "pending",
-                "description": "string",
-                "amount": goalAmount - oldGoal
-}
-        }).then(function(json){
-            const speech = utilities.changeGoal(json, goalAmount);
-            return speech;
-        })
-        .catch(function(err){
-            console.log("Error:" + err);
-        });
-    }
-    // else
-    //     withdraw oldGoal - goalAmount
-}
-
-
+  	var oldGoal = httpRequest({
+  		method: "GET",
+  		uri: childGoalAPIUrl,
+  		json: true
+  		}).then(function (json) {
+  		const oldGoalBalance = utilities.findBalance(json);
+  		return oldGoalBalance; 
+  		}).catch(function (err) {
+        console.log("Error:" + err);
+    });
+  		
+  	const childGoalDepositUrl = NESSIE_API_URL + CHILD_GOAL_ACCOUNT + "/deposits?key=" + NESSIE_API_KEY; 
+  	const childGoalWithdrawalUrl = NESSIE_API_URL + CHILD_GOAL_ACCOUNT + "/withdrawals?key=" + NESSIE_API_KEY
+  	if(goalAmount > oldGoal){
+  		return httpRequest({
+  			method: "POST",
+      		uri: childGoalDepositUrl,
+      		json: true,
+      		body:{
+      			"medium" : "balance",
+      			"transaction_date": "2018-10-06",
+      			"status": "pending",
+      			"description": "string"
+      			"amount": goalAmount - oldGoal
+          }}).then(function(json){
+          	const speech = utilities.changeGoal(json, goalAmount);
+          	return speech;
+          }).catch(function(err){
+          	console.log("Error:" + err);
+          });
+      }
+      else{
+      	return httpRequest({
+      		method: "POST", 
+      		uri: childGoalWithdrawalUrl,
+      		json: true,
+      		body:{
+      			"medium": "balance",
+      			"transaction_date": "2018-10-07",
+      			"status": "pending",
+      			"amount": oldGoal - goalAmount,
+      			"description": "string"
+      		}}).then(function(json){
+      			const speech = utilities.changeGoal(json, goalAmount);
+      			return speech; 
+      		}).catch(function(err){
+      			console.log("Error:" + err);
+      		});
+      }
+  }
 
   //*****************************
   // Transfer Action

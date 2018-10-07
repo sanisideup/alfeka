@@ -10,6 +10,7 @@ module.exports = {
         console.log("findBalance hit")
         return speech;
     },
+<<<<<<< Updated upstream
     addValueToChildAccount: function(json) {
         const valueAdded = json.objectCreated.amount
         var speech = ("Sure thing! I added " + valueAdded + " into my tummy.")
@@ -19,12 +20,15 @@ module.exports = {
     },
     changeGoal: function(json) {
         const goalAmount = json.balance
+=======
+    changeGoal: function(json, goalAmount) {
+>>>>>>> Stashed changes
         var speech = ("Your new goal is $" + goalAmount)
 
         console.log("changeGoal hit")
         return speech; 
     },
-    
+
     transferMoney: function(json) {
         const amountTransferred = json.objectCreated.amount
         var speech = ("You have transferred $" + amountTransferred + " to Mark's account")
