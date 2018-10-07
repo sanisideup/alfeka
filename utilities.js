@@ -3,79 +3,20 @@ const financeTips = require("./financeTips.json");
 const tickersData = require("./companyTickers.json");
 
 module.exports = {
-    findBalance: function(json, assistant) {
+    findBalance: function(json) {
         const balanceAmount = json.balance
         var speech = ("Your balance is $" + balanceAmount)
 
         console.log("findBalance hit")
         return speech;
     },
-   /* convertBalance: function(currency, json) {
-        const currentBalance = json.balance
-        var convertedBalance
-        var currencySymbol
+    changeGoal: function(json) {
+        const goalAmount = json.balance
+        var speech = ("Your new goal is $" + goalAmount)
 
-        switch (currency) {
-            case "euros":
-                convertedBalance = parseFloat(currentBalance * 1.12051).toFixed(2)
-                currencySymbol = "€"
-                break
-            case "yen":
-                convertedBalance = parseFloat(currentBalance * 111.476).toFixed(2)
-                currencySymbol = "¥"
-                break
-            case "pounds":
-                convertedBalance = parseFloat(currentBalance * 0.7768).toFixed(2)
-                currencySymbol = "£"
-            case "sterling":
-            case "pounds sterling":
-                convertedBalance = parseFloat(currentBalance * 0.7768).toFixed(2)
-                currencySymbol = "£"
-                break
-            default:
-                convertedBalance = currentBalance
-        }
-
-        var speech = ("Your converted balance from $ is: " + currencySymbol +  convertedBalance)
-        
-        console.log("convertBalance hit")
-        say.speak(speech)
-        return speech
-    }, */
-     findLastTransaction: function(json) {
-         const transAmount = json[0].amount
-         const transDate = json[0].purchase_date
-         const transDesc = json[0].description
-         console.log("findLastTransaction hit")
-         var speech = ""
-         if (transDesc != null) {
-             speech = ("Your last transaction was a purchase for " + transDesc +
-                 " in the amout of $" + transAmount + " on " + transDate);
-             say.speak(speech)
-             return speech
-         } else {
-             speech = ("Your last transaction was a purchase for " + transAmount +
-                 " " + "on" + " " + transDate);
-             say.speak(speech)
-             return speech
-         }
-
-     },
-    /*findCompanyTicker: function(companyName) {
-        if(companyName in tickersData[0]) {
-            return tickersData[0][companyName]
-        } else {
-          return nil
-        }
-    },*/
-    /*findStockPrice: function (companyName, companyTicker, json) {
-        const stockPrice = json.datatable.data[0][5]
-        var speech = ("As of today, the stock price of " + companyName + " is $" + stockPrice)
-        
-        console.log("findStockPrice hit")
-        say.speak(speech)
-        return speech
-    },*/
+        console.log("changeGoal hit")
+        return speech; 
+    }
     transferMoney: function(json) {
         const amountTransferred = json.objectCreated.amount
         var speech = ("You have transferred $" + amountTransferred + " to Mark's account")
@@ -137,17 +78,5 @@ module.exports = {
         console.log("findBill hit")
         say.speak(speech)
         return speech;
-    },
-
-    replyToUser: function(request, response, assistant, speech) {
-        if (request.body.originalRequest && request.body.originalRequest.source == "google") { //for google assistant
-            assistant.ask(speech + ". What else can I help you with?"); //assistant.tell will end the conversation
-        } else { //for slack
-            return {
-                messages: speech,
-                contextOut: speech,
-                source: "summit_bot"
-            };
-        }
     }
 }

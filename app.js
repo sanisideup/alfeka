@@ -19,6 +19,7 @@ const CHILD_CUSTOMER_ACCOUNT = "5bb94e3ef0cec56abfa43ccb";
 const CHILD_GOAL_ACCOUNT = "5bb957e8f0cec56abfa43ccd";
 const PARENT_CUSTOMER_ACCOUNT = "5bb934b4f0cec56abfa43cc7";
 const NESSIE_API_KEY = "1480c55ee503852320c55dd014980a60";
+const NESSIE_API_URL = "http://api.reimaginebanking.com/accounts/"; 
 
 //Register an endpoint that will listen on http://localhost:8080/
 app.post("/", function (request, response) {
@@ -53,47 +54,20 @@ app.post("/", function (request, response) {
   }
 
   function handleCheckBalanceHttp() {
-    const checkBalanceAPIUrl = "http://api.reimaginebanking.com/accounts/"
-    + CHILD_GOAL_ACCOUNT + "?key=" + NESSIE_API_KEY;
+    const checkBalanceAPIUrl = NESSIE_API_URL + CHILD_GOAL_ACCOUNT + "?key=" + NESSIE_API_KEY;
 
     return httpRequest({
         method: "GET",
         uri: checkBalanceAPIUrl,
         json: true
         }).then(function (json) {
-        const speech = utilities.findBalance(json, assistant);
+        const speech = utilities.findBalance(json);
         return speech;
         })
         .catch(function (err) {
         console.log("Error:" + err);
         const speech = "I could not check your balance. Ask me something else.";
         return speech;
-    });
-  }
-
-  //*****************************
-  // Last Transaction Action
-  //*****************************
-
-  //Action name for getting last transaction
-  const FIND_LAST_TRANSACTION_ACTION = "findLastTransaction"
-  //Handler function for getting the last transaction
-  function handleLastTransaction(assistant) {
-    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"+
-    CUSTOMER_ACCOUNT +"/purchases?key="+ NESSIE_API_KEY;
-
-    httpRequest({
-      method: "GET",
-      uri: nessieAPIUrl,
-      json: true
-    }).then(function(json){
-      const speech = utilities.findLastTransaction(json);
-      utilities.replyToUser(request, response,assistant, speech);
-    })
-    .catch(function(err){
-      console.log("Error:" + err);
-      const speech = "I cannot understand that request. Ask me something else";
-      utilities.replyToUser(request, response, assistant, speech);
     });
   }
 
@@ -105,21 +79,27 @@ app.post("/", function (request, response) {
   const CHANGE_GOAL_ACTION = "changeGoal"; 
   //Handler function for Nessie 
   function handleChangeGoal(assistant){
-  	const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"+
-    CHILD_GOAL_ACCOUNT +"/purchases?key="+ NESSIE_API_KEY;
+  	return handleChangeGoalHttp().then(results => {
+  		console.log(results);
+  		assistant.add(results);
+  	})
+  }
 
-     httpRequest({
-      method: "GET",
-      uri: nessieAPIUrl,
-      json: true
-    }).then(function(json){
-      const speech = utilities.changeGoal(json);
-      utilities.replyToUser(request, response,assistant, speech);
-    })
-    .catch(function(err){
-      console.log("Error:" + err);
-      const speech = "I cannot understand that request. Ask me something else";
-      utilities.replyToUser(request, response, assistant, speech);
+  function handleChangeGoalHttp(){
+  	const changeGoalAPIUrl = NESSIE_API_URL + CHILD_GOAL_ACCOUNT +"?key="+ NESSIE_API_KEY;
+
+     return httpRequest({
+     	method: "GET",
+      	uri: changeGoalAPIUrl,
+      	json: true
+    	}).then(function(json){
+      	const speech = utilities.changeGoal(json);
+      	return speech; 
+    	})
+    	.catch(function(err){
+      	console.log("Error:" + err);
+      	const speech = "I cannot understand that request. Ask me something else";
+      	return speech; 
     });
   }
 
@@ -136,7 +116,7 @@ app.post("/", function (request, response) {
     const TRANSFER_AMOUNT_ARG = "transferAmount"
     //2. Extract day of week from the assistant
     const transferAmount = parseFloat(assistant.getArgument(TRANSFER_AMOUNT_ARG));
-    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"+ CUSTOMER_ACCOUNT +"/transfers?key="+ NESSIE_API_KEY;
+    const nessieAPIUrl = NESSIE_API_URL + CUSTOMER_ACCOUNT +"/transfers?key="+ NESSIE_API_KEY;
 
     httpRequest({
       method: "POST",
@@ -168,7 +148,7 @@ app.post("/", function (request, response) {
   const FIND_BILL = "findBill"
   //Handler function for getting the last transaction
   function handleFindBill(assistant) {
-    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"+ CUSTOMER_ACCOUNT +"/bills?key="+ NESSIE_API_KEY;
+    const nessieAPIUrl = NESSIE_API_URL + CUSTOMER_ACCOUNT +"/bills?key="+ NESSIE_API_KEY;
     httpRequest({
       method: "GET",
       uri: nessieAPIUrl,
@@ -191,7 +171,7 @@ app.post("/", function (request, response) {
   const PAY_BILL = "payBill"
   //Handler function for getting the last transaction
   function handlePayBill(assistant) {
-    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"+ CUSTOMER_ACCOUNT +"/bills?key="+ NESSIE_API_KEY;
+    const nessieAPIUrl = NESSIE_API_URL + CUSTOMER_ACCOUNT +"/bills?key="+ NESSIE_API_KEY;
     httpRequest({
       method: "GET",
       uri: nessieAPIUrl,
@@ -214,8 +194,7 @@ app.post("/", function (request, response) {
   const SAVE_MONEY_ACTION = "saveMoney"
   //Handler function for getting the last transaction
   function handleSaveMoney(assistant) {
-    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"
-    + CUSTOMER_ACCOUNT + "/purchases?key=" + NESSIE_API_KEY;
+    const nessieAPIUrl = NESSIE_API_URL + CUSTOMER_ACCOUNT + "/purchases?key=" + NESSIE_API_KEY;
 
     httpRequest({
       method: "GET",
