@@ -10,6 +10,13 @@ module.exports = {
         console.log("findBalance hit")
         return speech;
     },
+    addValueToChildAccount: function(json) {
+        const valueAdded = json.objectCreated.amount
+        var speech = ("Sure thing! I added " + valueAdded + " into my tummy.")
+
+        console.log("addValue hit")
+        return speech;
+    },
     changeGoal: function(json) {
         const goalAmount = json.balance
         var speech = ("Your new goal is $" + goalAmount)
