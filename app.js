@@ -109,6 +109,50 @@ app.post("/", function (request, response) {
   }
 
   //******************************
+  // Checking if met target 
+  //******************************
+
+  const CHECK_GOAL_ACTION = "checkGoal"; 
+
+  function handleCheckGoal(assistant){
+  	return handleCheckGoalHttp().then(results => {
+  		console.log(results);
+  		assistant.add(results);
+  	});
+  }
+
+  function handleCheckGoalHttp(){
+  	const childGoalAPIUrl = NESSIE_API_URL + CHILD_GOAL_ACCOUNT +"?key="+ NESSIE_API_KEY;
+  	const childAccountAPIUrl = NESSIE_API_URL + CHILD_CUSTOMER_ACCOUNT +"?key="+ NESSIE_API_KEY;
+  	return httpRequest({
+  		method: "GET",
+  		uri: childGoalAPIUrl,
+  		json: true
+  		}).then(function (json) {
+
+          var goalBalance = json.balance;
+          httpRequest({
+          	method: "GET",
+          	uri: childAccountAPIUrl,
+          	json: true
+          }).then(function (json) {
+          var accountBalance = json.balance;
+
+          if(accountBalance == goalBalance){
+          	const speech = utilities.checkGoal(json); 
+          	return speach; 
+          }
+  		}).catch(function (err) {
+        console.log("Error:" + err);
+    })
+  		}).catch(function (err) {
+        console.log("Error:" + err);
+    })
+  }
+
+
+
+  //******************************
   // Changing Target Goal 
   //******************************
 
