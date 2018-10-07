@@ -46,7 +46,7 @@ app.post("/", function (request, response) {
   //Action name for checking balance
   const CHECK_BALANCE_ACTION = "checkBalance";
   //Handler function for Nessie
-  function handleCheckBalance(assistant) {
+  function handleCheckBalance(assistant) { 
     return handleCheckBalanceHttp().then(results => {
         console.log(results);
         assistant.add(results);
@@ -70,7 +70,48 @@ app.post("/", function (request, response) {
     });
   }
 
-  //******************************
+    // **************************
+  //  Add value to child account
+  // **************************
+
+  //Action name for checking balance
+  const ADD_VALUE_ACTION = "addValueToChildAccount";
+  //Handler function for Nessie
+  function handleAddValueToChild(assistant) {
+    const transferAmount = parseFloat(assistant.parameters.transferAmount.amount);
+    return handleAddValueToChildHttp(transferAmount).then(results => {
+        console.log(results);
+        assistant.add(results);
+    });
+  }
+
+  function handleAddValueToChildHttp(transferAmount) {
+    const addValueUrl = NESSIE_API_URL + PARENT_CUSTOMER_ACCOUNT +"/transfers?key="+ NESSIE_API_KEY;
+    console.log(addValueUrl)
+    console.log(transferAmount)    
+
+    return httpRequest({
+        method: "POST",
+        uri: addValueUrl,
+        json: true,
+        body: {
+            "medium": "balance",
+            "payee_id": CHILD_CUSTOMER_ACCOUNT,
+            "amount": transferAmount,
+            "description": "Allowance for child"
+        }
+        }).then(function (json) {
+        const speech = utilities.addValueToChildAccount(json);
+        return speech;
+        })
+        .catch(function (err) {
+        console.log("Error:" + err);
+        const speech = "I could not transfer money. Try again later";
+        return speech;
+    });
+  }
+
+    //******************************
   // Changing Target Goal 
   //******************************
 
@@ -89,42 +130,43 @@ app.post("/", function (request, response) {
   }
 
   function handleChangeGoalHttp(goalAmount){
-  	const childGoalAPIUrl = NESSIE_API_URL + CHILD_GOAL_ACCOUNT +"?key="+ NESSIE_API_KEY;
+    const childGoalAPIUrl = NESSIE_API_URL + CHILD_GOAL_ACCOUNT +"?key="+ NESSIE_API_KEY;
 
-  	var oldGoal = httpRequest({
-  		method: "GET",
-  		uri: childGoalAPIUrl,
-  		json: true
-  		}).then(function (json) {
-  		const oldGoalBalance = utilities.findBalance(json);
-  		return oldGoalBalance; 
-  		}).catch(function (err) {
-        console.log("Error:" + err);
-    });
-  		
-  	if(goalAmount > oldGoal){
-  		return httpRequest({
-  			method: "POST",
-      		uri: childGoalAPIUrl,
-      		json: true,
-      		body: {
-      			"medium": "balance",
-          		"payee_id": "5bb957e8f0cec56abfa43ccd",
-          		"amount": goalAmount - oldGoal,
-          		"transaction_date": "2018-07-10",
-          		"description": "string"
-          	}
-          }).then(function(json){
-          	const speech = utilities.transferMoney(json);
-          	return speech;
-          })
-          .catch(function(err){
-          	console.log("Error:" + err);
-          });
-      }
-      else
-      	withdraw oldGoal - goalAmount
-  }
+    var oldGoal = httpRequest({
+        method: "GET",
+        uri: childGoalAPIUrl,
+        json: true
+        }).then(function (json) {
+        const oldGoalBalance = utilities.findBalance(json);
+        return oldGoalBalance; 
+        }).catch(function (err) {
+      console.log("Error:" + err);
+  });
+        
+    const childGoalDepositUrl = NESSIE_API_URL + CHILD_GOAL_ACCOUNT + "/deposits?key=" + NESSIE_API_KEY; 
+    if(goalAmount > oldGoal){
+        return httpRequest({
+            method: "POST",
+            uri: childGoalDepositUrl,
+            json: true,
+            body:{
+                "medium" : "balance",
+                "status": "pending",
+                "description": "string",
+                "amount": goalAmount - oldGoal
+}
+        }).then(function(json){
+            const speech = utilities.changeGoal(json, goalAmount);
+            return speech;
+        })
+        .catch(function(err){
+            console.log("Error:" + err);
+        });
+    }
+    // else
+    //     withdraw oldGoal - goalAmount
+}
+
 
 
   //*****************************
@@ -239,12 +281,14 @@ app.post("/", function (request, response) {
   //For each action, set a mapping between the action name and the handler function
   actionMap.set(WELCOME_ACTION, handleWelcome);
   actionMap.set(CHECK_BALANCE_ACTION, handleCheckBalance);
+  actionMap.set(ADD_VALUE_ACTION, handleAddValueToChild);
   actionMap.set(CHANGE_GOAL_ACTION, handleChangeGoal);
   actionMap.set(TRANSFER_MONEY_ACTION, handleTransferMoney);
   actionMap.set(FIND_BILL, handleFindBill);
   actionMap.set(PAY_BILL, handlePayBill);
   actionMap.set(SAVE_MONEY_ACTION, handleSaveMoney);
 
+  console.log(actionMap);
 
   //Register the action map with the assistant
   assistant.handleRequest(actionMap);
