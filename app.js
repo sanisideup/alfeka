@@ -216,7 +216,6 @@ app.post("/", function (request, response) {
   //For each action, set a mapping between the action name and the handler function
   actionMap.set(WELCOME_ACTION, handleWelcome);
   actionMap.set(CHECK_BALANCE_ACTION, handleCheckBalance);
-  actionMap.set(FIND_LAST_TRANSACTION_ACTION, handleLastTransaction);
   actionMap.set(CHANGE_GOAL_ACTION, handleChangeGoal);
   actionMap.set(TRANSFER_MONEY_ACTION, handleTransferMoney);
   actionMap.set(FIND_BILL, handleFindBill);
