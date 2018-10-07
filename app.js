@@ -2,6 +2,7 @@
 
 //Setup / Import libraries
 const ApiAiAssistant = require("actions-on-google").ApiAiAssistant;
+const {WebhookClient} = require('dialogflow-fulfillment');
 const express = require("express");
 const bodyParser = require("body-parser");
 const httpRequest = require("request-promise");
@@ -12,6 +13,8 @@ const app = express();
 app.set("port", (process.env.PORT || 8080));
 app.use(bodyParser.json({type: "application/json"}));
 
+process.env.DEBUG = 'dialogflow:debug'; // enables lib debugging statements
+
 const CHILD_CUSTOMER_ACCOUNT = "5bb94e3ef0cec56abfa43ccb";
 const CHILD_GOAL_ACCOUNT = "5bb957e8f0cec56abfa43ccd";
 const PARENT_CUSTOMER_ACCOUNT = "5bb934b4f0cec56abfa43cc7";
@@ -20,8 +23,8 @@ const NESSIE_API_KEY = "1480c55ee503852320c55dd014980a60";
 //Register an endpoint that will listen on http://localhost:8080/
 app.post("/", function (request, response) {
   //Create an instance of API.AI assistant
-  const assistant = new ApiAiAssistant({request: request, response: response});
-  console.log('works')
+  const assistant = new WebhookClient({request, response});
+
 
   // **************************
   //    Welcome Action
@@ -32,7 +35,7 @@ app.post("/", function (request, response) {
 
   //handler function for welcome
   function handleWelcome (assistant) { //for Google Assistant only
-    assistant.ask("Hi, I'm alfeka - I'm you're friendly financial assistant!");
+    assistant.add("Hi, I'm alfeka - I'm you're friendly financial assistant!");
   }
 
   // **************************
@@ -43,23 +46,28 @@ app.post("/", function (request, response) {
   const CHECK_BALANCE_ACTION = "checkBalance";
   //Handler function for Nessie
   function handleCheckBalance(assistant) {
-    //http://api.reimaginebanking.com/accounts/5925e8aba73e4942cdafd649?key=d5b7be3380bb6eb21f3c377b204f3ebc
-    const checkBalanceAPIUrl = "http://api.reimaginebanking.com/accounts/"
-    + CUSTOMER_ACCOUNT + "?key=" + NESSIE_API_KEY;
-
-    httpRequest({
-      method: "GET",
-      uri: checkBalanceAPIUrl,
-      json: true
-    }).then(function (json) {
-      const speech = utilities.findBalance(json);
-      
-      utilities.replyToUser(request, response, assistant, speech);
+    return handleCheckBalanceHttp().then(results => {
+        console.log(results);
+        assistant.add(results);
     })
-    .catch(function (err) {
-      console.log("Error:" + err);
-      const speech = "I could not check your balance. Ask me something else.";
-      utilities.replyToUser(request, response, assistant, speech);
+  }
+
+  function handleCheckBalanceHttp() {
+    const checkBalanceAPIUrl = "http://api.reimaginebanking.com/accounts/"
+    + CHILD_GOAL_ACCOUNT + "?key=" + NESSIE_API_KEY;
+
+    return httpRequest({
+        method: "GET",
+        uri: checkBalanceAPIUrl,
+        json: true
+        }).then(function (json) {
+        const speech = utilities.findBalance(json, assistant);
+        return speech;
+        })
+        .catch(function (err) {
+        console.log("Error:" + err);
+        const speech = "I could not check your balance. Ask me something else.";
+        return speech;
     });
   }
 
@@ -115,8 +123,6 @@ app.post("/", function (request, response) {
     });
   }
 
-  	
-  }
 
   //*****************************
   // Transfer Action
@@ -231,10 +237,8 @@ app.post("/", function (request, response) {
   //For each action, set a mapping between the action name and the handler function
   actionMap.set(WELCOME_ACTION, handleWelcome);
   actionMap.set(CHECK_BALANCE_ACTION, handleCheckBalance);
-  actionMap.set(CONVERT_BALANCE_ACTION, handleConvertBalance)
   actionMap.set(FIND_LAST_TRANSACTION_ACTION, handleLastTransaction);
   actionMap.set(SAVE_MONEY_ACTION, handleSaveMoney);
-  actionMap.set(CURRENT_STOCK_PRICE_ACTION, handleStockPrice);
   actionMap.set(FIND_BILL, handleFindBill);
   actionMap.set(TRANSFER_MONEY_ACTION, handleTransferMoney);
   actionMap.set(PAY_BILL, handlePayBill);

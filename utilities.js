@@ -3,12 +3,11 @@ const financeTips = require("./financeTips.json");
 const tickersData = require("./companyTickers.json");
 
 module.exports = {
-    findBalance: function(json) {
+    findBalance: function(json, assistant) {
         const balanceAmount = json.balance
         var speech = ("Your balance is $" + balanceAmount)
 
         console.log("findBalance hit")
-        // say.speak(speech)
         return speech;
     },
    /* convertBalance: function(currency, json) {
@@ -144,11 +143,11 @@ module.exports = {
         if (request.body.originalRequest && request.body.originalRequest.source == "google") { //for google assistant
             assistant.ask(speech + ". What else can I help you with?"); //assistant.tell will end the conversation
         } else { //for slack
-            return response.json({
-                speech: speech,
-                displayText: speech,
+            return {
+                messages: speech,
+                contextOut: speech,
                 source: "summit_bot"
-            });
+            };
         }
     }
 }
