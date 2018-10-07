@@ -82,7 +82,7 @@ app.post("/", function (request, response) {
   	return handleChangeGoalHttp().then(results => {
   		console.log(results);
   		assistant.add(results);
-  	})
+  	});
   }
 
   function handleChangeGoalHttp(){
@@ -233,3 +233,4 @@ const server = app.listen(app.get("port"), function () {
   console.log("App listening on port %s", server.address().port);
   console.log("Press Ctrl+C to quit.");
 });
+

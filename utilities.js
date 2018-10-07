@@ -16,7 +16,8 @@ module.exports = {
 
         console.log("changeGoal hit")
         return speech; 
-    }
+    },
+    
     transferMoney: function(json) {
         const amountTransferred = json.objectCreated.amount
         var speech = ("You have transferred $" + amountTransferred + " to Mark's account")
