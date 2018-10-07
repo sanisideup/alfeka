@@ -97,6 +97,23 @@ app.post("/", function (request, response) {
   const CHANGE_GOAL_ACTION = "changeGoal"; 
   //Handler function for Nessie 
   function handleChangeGoal(assistant){
+  	const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"+
+    CHILD_GOAL_ACCOUNT +"/purchases?key="+ NESSIE_API_KEY;
+
+     httpRequest({
+      method: "GET",
+      uri: nessieAPIUrl,
+      json: true
+    }).then(function(json){
+      const speech = utilities.changeGoal(json);
+      utilities.replyToUser(request, response,assistant, speech);
+    })
+    .catch(function(err){
+      console.log("Error:" + err);
+      const speech = "I cannot understand that request. Ask me something else";
+      utilities.replyToUser(request, response, assistant, speech);
+    });
+  }
 
   	
   }
