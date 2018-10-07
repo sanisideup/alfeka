@@ -8,7 +8,7 @@ module.exports = {
         var speech = ("Your balance is $" + balanceAmount)
 
         console.log("findBalance hit")
-        say.speak(speech)
+        // say.speak(speech)
         return speech;
     },
     convertBalance: function(currency, json) {

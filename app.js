@@ -9,13 +9,19 @@ require("string_score");
 const utilities = require("./utilities.js"); //utility functions
 const app = express();
 
-app.set("port", (process.env.PORT || 8081));
+app.set("port", (process.env.PORT || 8080));
 app.use(bodyParser.json({type: "application/json"}));
+
+const CHILD_CUSTOMER_ACCOUNT = "5bb94e3ef0cec56abfa43ccb";
+const CHILD_GOAL_ACCOUNT = "5bb957e8f0cec56abfa43ccd";
+const PARENT_CUSTOMER_ACCOUNT = "5bb934b4f0cec56abfa43cc7";
+const NESSIE_API_KEY = "1480c55ee503852320c55dd014980a60";
 
 //Register an endpoint that will listen on http://localhost:8080/
 app.post("/", function (request, response) {
   //Create an instance of API.AI assistant
   const assistant = new ApiAiAssistant({request: request, response: response});
+  console.log('works')
 
   // **************************
   //    Welcome Action
@@ -26,7 +32,7 @@ app.post("/", function (request, response) {
 
   //handler function for welcome
   function handleWelcome (assistant) { //for Google Assistant only
-    assistant.ask("Hi, I'm fabio - ask me a question!");
+    assistant.ask("Hi, I'm alfeka - I'm you're friendly financial assistant!");
   }
 
   // **************************
@@ -70,7 +76,7 @@ app.post("/", function (request, response) {
   function handleConvertBalance(assistant) {
     //1. Declare argument constant for user input (currency)
     const CURRENCY_ARG = "currency";
-    //2. Extract day of week from the assistant
+    //2. Extract type of currency from the assistant
     const currency = assistant.getArgument(CURRENCY_ARG).toLowerCase();
     console.log(currency)
     //3. Perform networking call to Nessie API and speak result
