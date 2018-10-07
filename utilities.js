@@ -1,3 +1,6 @@
+const SerialPort = require('serialport')
+const port = new SerialPort('/dev/tty.usbmodem14131')
+
 
 const financeTips = require("./financeTips.json");
 const tickersData = require("./companyTickers.json");
@@ -7,12 +10,33 @@ module.exports = {
         const balanceAmount = json.balance
         var speech = ("Your balance is $" + balanceAmount)
 
+        port.write('B', function(err) {
+            if (err) {
+              return console.log('Error on write: ', err.message)
+            }
+            console.log('message written')
+        })
+
         console.log("findBalance hit")
         return speech;
     },
     addValueToChildAccount: function(json) {
         const valueAdded = json.objectCreated.amount
         var speech = ("Sure thing! I added " + valueAdded + " into my tummy.")
+
+        //sends alfeka commands
+        port.write('A', function(err) {
+            if (err) {
+              return console.log('Error on write: ', err.message)
+            }
+            console.log('A message written')
+        })
+        port.write('B', function(err) {
+            if (err) {
+              return console.log('Error on write: ', err.message)
+            }
+            console.log('B message written')
+        })
 
         console.log("addValue hit")
         return speech;
