@@ -6,7 +6,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const httpRequest = require("request-promise");
 require("string_score");
-const utilities = require("./utilities.js"); //utility functions
+const utilities = require("./utilities.js"); //utilityy functions
 const app = express();
 
 app.set("port", (process.env.PORT || 8080));
@@ -304,3 +304,102 @@ const server = app.listen(app.get("port"), function () {
   console.log("App listening on port %s", server.address().port);
   console.log("Press Ctrl+C to quit.");
 });
+
+
+  /*// **************************
+  //  Convert Balance Action
+  // **************************
+
+  //Action name for converting balance
+  const CONVERT_BALANCE_ACTION = "convertBalance";
+  //Handler function for Nessie
+  function handleConvertBalance(assistant) {
+    //1. Declare argument constant for user input (currency)
+    const CURRENCY_ARG = "currency";
+    //2. Extract day of week from the assistant
+    const currency = assistant.getArgument(CURRENCY_ARG).toLowerCase();
+    console.log(currency)
+    //3. Perform networking call to Nessie API and speak result
+    const CUSTOMER_ACCOUNT = "5925e8aba73e4942cdafd649"
+    const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
+
+    const convertBalanceAPIUrl = "http://api.reimaginebanking.com/accounts/"
+    + CUSTOMER_ACCOUNT + "?key=" + NESSIE_API_KEY;
+
+    httpRequest({
+      method: "GET",
+      uri: convertBalanceAPIUrl,
+      json: true
+    }).then(function (json) {
+      const speech = utilities.convertBalance(currency, json);
+      utilities.replyToUser(request, response, assistant, speech);
+    })
+    .catch(function (err) {
+      console.log("Error:" + err);
+      const speech = "I could not convert your balance. Ask me something else.";
+      utilities.replyToUser(request, response, assistant, speech);
+    });
+  }
+*/
+  //*****************************
+  // Last Transaction Action
+  //*****************************
+
+  //Action name for getting last transaction
+ /* const FIND_LAST_TRANSACTION_ACTION = "findLastTransaction"
+  //Handler function for getting the last transaction
+  function handleLastTransaction(assistant) {
+    //Perform networking call to Nessie API and speak result
+    const CUSTOMER_ACCOUNT = "5925e8aba73e4942cdafd649"
+    const NESSIE_API_KEY = "d5b7be3380bb6eb21f3c377b204f3ebc";
+    const nessieAPIUrl = "http://api.reimaginebanking.com/accounts/"+
+    CUSTOMER_ACCOUNT +"/purchases?key="+ NESSIE_API_KEY;
+
+    httpRequest({
+      method: "GET",
+      uri: nessieAPIUrl,
+      json: true
+    }).then(function(json){
+      const speech = utilities.findLastTransaction(json);
+      utilities.replyToUser(request, response,assistant, speech);
+    })
+    .catch(function(err){
+      console.log("Error:" + err);
+      const speech = "I cannot understand that request. Ask me something else";
+      utilities.replyToUser(request, response, assistant, speech);
+    });
+  }
+*/
+  //*****************************
+  // Current Stock Price
+  //*****************************
+
+  /*//Action name for finding stock price
+  const CURRENT_STOCK_PRICE_ACTION = "currentStockPrice"
+  //Handler function for getting the last transaction
+  function handleStockPrice(assistant) {
+    //1. Declare argument constant for user input (company name)
+    const COMPANY_NAME_ARG = "companyName";
+    //2. Extract company name from the assistant
+    const companyName = assistant.getArgument(COMPANY_NAME_ARG).toLowerCase();
+    const companyTicker = utilities.findCompanyTicker(companyName);
+
+    //Extract company name and convert to ticker
+    const stockAPIUrl = "http://www.quandl.com/api/v3/datatables/WIKI/PRICES.json?date=20170525&ticker=" + companyTicker + "&api_key=xyrBzPSyVzqturdzFyKZ";
+
+    httpRequest({
+      method: "GET",
+      uri: stockAPIUrl,
+      json: true
+    }).then(function(json){
+      const speech = utilities.findStockPrice(companyName, companyTicker, json);
+      utilities.replyToUser(request, response, assistant, speech);
+    })
+    .catch(function(err){
+      console.log("Error:" + err);
+      const speech = "I cannot understand that request. Ask me something else";
+      utilities.replyToUser(request, response, assistant, speech);
+    });
+  }
+*/
+ 
